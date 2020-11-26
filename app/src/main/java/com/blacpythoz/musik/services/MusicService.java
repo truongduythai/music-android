@@ -67,6 +67,10 @@ public class MusicService extends Service implements
         return musicBind;
     }
 
+    public Callback getCallback() {
+        return callback;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();

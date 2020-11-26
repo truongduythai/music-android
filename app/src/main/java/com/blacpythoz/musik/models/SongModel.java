@@ -21,36 +21,33 @@ public class SongModel {
     private String albumName;
     private String albumArt;
     private String data;
+    private boolean isFavourite;
 
 
     public static SongModel EMPTY() {
-        return new SongModel(0,"","","","","","",0,0,0,0,0,0,0,0);
+        return new SongModel(0, 0, 0, 0, 0, 0, 0, 0, 0, "", "", "", "", "", "");
     }
 
-    public void setAlbumArt(String albumArt) {
-        this.albumArt = albumArt;
-    }
-
-    public SongModel(int id, String title, String artistName,
-                     String composer, String albumName, String albumArt,
-                     String data, int trackNumber, int year, long duration,
-                     long dateModified, long dateAdded, int albumId, int artistId,
-                     long bookmark) {
+    public SongModel(int id, int trackNumber, int year, int albumId, int artistId, long duration, long dateModified, long dateAdded, long bookmark, String title, String artistName, String composer, String albumName, String albumArt, String data) {
         this.id = id;
+        this.trackNumber = trackNumber;
+        this.year = year;
+        this.albumId = albumId;
+        this.artistId = artistId;
+        this.duration = duration;
+        this.dateModified = dateModified;
+        this.dateAdded = dateAdded;
+        this.bookmark = bookmark;
         this.title = title;
         this.artistName = artistName;
         this.composer = composer;
         this.albumName = albumName;
         this.albumArt = albumArt;
         this.data = data;
-        this.trackNumber = trackNumber;
-        this.year = year;
-        this.duration = duration;
-        this.dateModified = dateModified;
-        this.dateAdded = dateAdded;
-        this.albumId = albumId;
-        this.artistId = artistId;
-        this.bookmark = bookmark;
+    }
+
+    public void setAlbumArt(String albumArt) {
+        this.albumArt = albumArt;
     }
 
     public int getId() {
@@ -111,5 +108,13 @@ public class SongModel {
 
     public long getBookmark() {
         return bookmark;
+    }
+
+    public boolean isFavourite() {
+        return isFavourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        isFavourite = favourite;
     }
 }

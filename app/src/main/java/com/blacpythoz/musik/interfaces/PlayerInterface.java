@@ -24,6 +24,7 @@ public interface PlayerInterface {
         void onCompletion(SongModel song);
         void onTrackChange(SongModel song);
         void onPause();
+        void onAddedFavourite(boolean isFavourite);
     }
 }
 
