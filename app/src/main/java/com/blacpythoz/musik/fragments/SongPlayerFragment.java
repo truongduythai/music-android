@@ -2,22 +2,15 @@ package com.blacpythoz.musik.fragments;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -26,6 +19,7 @@ import android.widget.TextView;
 
 import com.blacpythoz.musik.R;
 import com.blacpythoz.musik.activities.MusicServiceActivity;
+import com.blacpythoz.musik.activities.PlayerActivity;
 import com.blacpythoz.musik.interfaces.PlayerInterface;
 import com.blacpythoz.musik.models.SongModel;
 import com.blacpythoz.musik.services.MusicService;
@@ -58,6 +52,7 @@ public class SongPlayerFragment extends MusicServiceFragment {
     private ImageView panelPlayBtn;
     private ImageView panelNextBtn;
     private ImageView panelPrevBtn;
+    private ImageView btnFavourite;
 
     private BottomSheetBehavior bottomSheetBehavior;
     private ConstraintLayout panelLayout;
@@ -92,6 +87,7 @@ public class SongPlayerFragment extends MusicServiceFragment {
         currentCoverArt = view.findViewById(R.id.iv_pn_cover_art);
         currentCoverArtShadow = view.findViewById(R.id.iv_pn_cover_art_shadow);
         actionBtn = view.findViewById(R.id.iv_pn_action_btn);
+        btnFavourite = view.findViewById(R.id.iv_favourite);
         seekBar = view.findViewById(R.id.sb_pn_player);
         totalTime = view.findViewById(R.id.tv_pn_total_time);
         remainingTime = view.findViewById(R.id.tv_pn_remain_time);
@@ -253,6 +249,32 @@ public class SongPlayerFragment extends MusicServiceFragment {
             public void onPause() {
                 //actionBtn.setBackgroundResource(R.drawable.ic_media_play);
             }
+
+            @Override
+            public void onAddedFavourite(boolean isFavourite) {
+                btnFavourite.setImageResource(isFavourite ? R.drawable.ic_like : R.drawable.ic_unlike);
+            }
+        });
+
+        btnFavourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SongModel song = musicService.getCurrentSong();
+                if (song != null && getActivity() instanceof MusicServiceActivity) {
+                    if (song.isFavourite()) {
+                        ((MusicServiceActivity) getActivity()).removeSongFromFavourite(song);
+                        song.setFavourite(false);
+                        btnFavourite.setImageResource(R.drawable.ic_unlike);
+                    } else {
+                        ((MusicServiceActivity) getActivity()).addSongToFavourite(song);
+                        song.setFavourite(true);
+                        btnFavourite.setImageResource(R.drawable.ic_like);
+                    }
+                    if (getActivity() instanceof PlayerActivity) {
+                        ((PlayerActivity) getActivity()).reloadData();
+                    }
+                }
+            }
         });
     }
 
@@ -315,7 +337,7 @@ public class SongPlayerFragment extends MusicServiceFragment {
                         currentArtist.setText(song.getArtistName());
                         currentCoverArt.setImageBitmap(bitmap);
                         Blurry.with(getActivity()).radius(20).sampling(2).from(bitmap).into(currentCoverArtShadow);
-
+                        btnFavourite.setImageResource(song.isFavourite() ? R.drawable.ic_like : R.drawable.ic_unlike);
                     }
                 });
             }

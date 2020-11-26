@@ -9,7 +9,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.blacpythoz.musik.models.SongModel;
 import com.blacpythoz.musik.services.MusicService;
+import com.blacpythoz.musik.utils.DatabaseHandler;
+
+import java.util.List;
 
 /**
  * Created by deadsec on 9/20/17.
@@ -26,10 +30,12 @@ public abstract class MusicServiceActivity extends PermitActivity {
     boolean boundService = false;
     Intent playIntent;
     MusicService.MusicBinder binder;
+    DatabaseHandler databaseHandler;
 
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG,"onCreate of "+TAG);
+        databaseHandler = new DatabaseHandler(this);
         if (savedInstanceState != null) {
             isPlaying = savedInstanceState.getBoolean(PLAY_STATE);
         }
@@ -106,5 +112,21 @@ public abstract class MusicServiceActivity extends PermitActivity {
         outState.putBoolean(PLAY_STATE, musicService.isPlaying());
         outState.putLong(SONG_ID,musicService.getCurrentSong().getId());
         outState.putInt(DURATION,musicService.getCurrentStreamPosition());
+    }
+
+    public void addSongToFavourite(SongModel song) {
+        databaseHandler.addFavouriteSong(song);
+    }
+
+    public void removeSongFromFavourite(SongModel song) {
+        databaseHandler.deleteFavouriteSong(song.getId());
+    }
+
+    public List<SongModel> getAllFavouriteSongs() {
+        return databaseHandler.getAllFavouriteSongs();
+    }
+
+    public boolean checkAddedFavourite(int id) {
+        return databaseHandler.checkAddedFavourite(id);
     }
 }

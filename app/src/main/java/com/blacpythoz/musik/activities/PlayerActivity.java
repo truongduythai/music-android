@@ -19,6 +19,7 @@ import com.blacpythoz.musik.adapters.AlbumAdapter;
 import com.blacpythoz.musik.adapters.SectionsPageAdapter;
 import com.blacpythoz.musik.fragments.AlbumListFragment;
 import com.blacpythoz.musik.fragments.ArtistListFragment;
+import com.blacpythoz.musik.fragments.FavouriteListFragment;
 import com.blacpythoz.musik.fragments.PlayListFragment;
 import com.blacpythoz.musik.fragments.SongListFragment;
 import com.blacpythoz.musik.fragments.SongPlayerFragment;
@@ -29,6 +30,7 @@ public class PlayerActivity extends MusicServiceActivity {
     public static final String TAG = PlayerActivity.class.getSimpleName();
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private SectionsPageAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,7 +80,7 @@ public class PlayerActivity extends MusicServiceActivity {
 
 
     private void setupViewPager(ViewPager viewPager) {
-        SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
+        adapter = new SectionsPageAdapter(getSupportFragmentManager());
         SongListFragment songListFragment;
         AlbumListFragment albumListFragment;
         PlayListFragment playListFragment;
@@ -91,6 +93,7 @@ public class PlayerActivity extends MusicServiceActivity {
         adapter.addFragment(albumListFragment, "Albums");
         adapter.addFragment(artistListFragment, "Artist");
         adapter.addFragment(playListFragment, "PlayList");
+        adapter.addFragment(new FavouriteListFragment(), "Favourites");
         viewPager.setAdapter(adapter);
     }
 
@@ -131,5 +134,10 @@ public class PlayerActivity extends MusicServiceActivity {
         super.onConfigurationChanged(newConfig);
     }
 
+    public void reloadData() {
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+    }
 }
 

@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.blacpythoz.musik.R;
+import com.blacpythoz.musik.activities.MusicServiceActivity;
+import com.blacpythoz.musik.activities.PlayerActivity;
 import com.blacpythoz.musik.models.SongModel;
 import com.blacpythoz.musik.adapters.SongAdapter;
 import com.blacpythoz.musik.services.MusicService;
@@ -82,12 +84,30 @@ public class SongListFragment extends MusicServiceFragment {
             public void onSongBtnClickListener(ImageButton btn, View v, final SongModel song, final int pos) {
                 final PopupMenu popupMenu=new PopupMenu(getContext(),btn);
                 popupMenu.getMenuInflater().inflate(R.menu.song_action_menu,popupMenu.getMenu());
+                popupMenu.getMenu().findItem(R.id.add_to_list).setTitle(song.isFavourite() ? "Remove from list" : "Add to list");
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        if(item.getTitle().equals("Play")) {
+                        if (item.getItemId() == R.id.play_song) {
                             playSong(song);
+                        }
+                        if (item.getItemId() == R.id.add_to_list) {
+                            if (getActivity() instanceof MusicServiceActivity) {
+                                if (song.isFavourite()) {
+                                    ((MusicServiceActivity) getActivity()).removeSongFromFavourite(song);
+                                    song.setFavourite(false);
+                                    musicSrv.getCallback().onAddedFavourite(false);
+                                } else {
+                                    ((MusicServiceActivity) getActivity()).addSongToFavourite(song);
+                                    song.setFavourite(true);
+                                    musicSrv.getCallback().onAddedFavourite(true);
+                                }
+                            }
+                            adapter.notifyItemChanged(pos);
+                            if (getActivity() instanceof PlayerActivity) {
+                                ((PlayerActivity) getActivity()).reloadData();
+                            }
                         }
                         return false;
                     }
@@ -100,6 +120,12 @@ public class SongListFragment extends MusicServiceFragment {
     //initialize all the component
     public void initFragment() {
         songs=musicSrv.getSongs();
+        if (getActivity() instanceof MusicServiceActivity) {
+            for (int i = 0; i< songs.size(); i++) {
+                songs.get(i).setFavourite(((MusicServiceActivity) getActivity()).checkAddedFavourite(songs.get(i).getId()));
+            }
+        }
+
         Log.d(TAG,songs.get(0).getTitle());
         adapter=new SongAdapter(songs,getContext());
         recyclerView.setAdapter(adapter);
